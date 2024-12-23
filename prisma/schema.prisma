@@ -12,3 +12,32 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum userStatus {
+  waitingConfirmation @map("waiting_confirmation")
+  active
+  banned
+
+  @@map("user_status")
+}
+
+enum userRole {
+  user
+  organizer
+  admin
+  superadmin
+
+  @@map("user_role")
+}
+
+model User {
+  id              String     @id @default(uuid())
+  name            String
+  email           String     @unique
+  password        String?
+  emailVerifiedAt DateTime?  @map("email_verified_at")
+  status          userStatus
+  role            userRole
+
+  @@map("users")
+}
