@@ -1,7 +1,7 @@
 import { html } from 'hono/html';
 import { EventProps } from '../../../types/event';
 
-const PageDetail = ({id, title, date, location, description, price, ticketLeft, eventOrganizier}: EventProps) => {
+const PageDetail = ({eventId, name, dateStart, dateEnd, location, description, ticketPrice, ticketAmount, organizier}: EventProps) => {
   return html`
     <!-- Page header -->
     <div class="page-header d-print-none">
@@ -9,9 +9,9 @@ const PageDetail = ({id, title, date, location, description, price, ticketLeft, 
         <div class="row g-2 align-items-center">
           <div class="col">
             <!-- Page pre-title -->
-            <h2 class="page-pretitle">By ${eventOrganizier ? eventOrganizier.name : ''}</h2>
+            <h2 class="page-pretitle">By ${organizier ? organizier.name : ''}</h2>
             <h2 class="page-title">
-              ${title}
+              ${name}
             </h2>
           </div>
         </div>
@@ -31,20 +31,20 @@ const PageDetail = ({id, title, date, location, description, price, ticketLeft, 
                   </div>
                 </div>
                 <div class="card-body">
-                  <h3 class="card-title">${date}</h3>
+                  <h3 class="card-title">${dateStart} s/d ${dateEnd}</h3>
                   <h4 class="card-title">${location}</h4>
                   <p class="text-secondary">
                     ${description}
                   </p>
                   <div class="row row-deck">
                     <div class="col-md-1">Harga Tiket</div>
-                    <div class="col-md-11">: Rp ${price}</div>
+                    <div class="col-md-11">: Rp ${ticketPrice}</div>
 
                     <div class="col-md-1">Sisa Tiket</div>
-                    <div class="col-md-11">: ${ticketLeft}</div>
+                    <div class="col-md-11">: ${ticketAmount}</div>
 
                     <div class="col-12">
-                      <a href="/event/${id}/order" class="btn btn-success btn-md mt-5">Beli Tiket</a>
+                      <a href="/event/${eventId}/order" class="btn btn-success btn-md mt-5">Beli Tiket</a>
                     </div>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 import { html } from 'hono/html';
 import { EventProps } from '../../../types/event';
 
-const PageOrder = ({id, title, date, location, description, price, ticketLeft, eventOrganizier}: EventProps) => {
+const PageOrder = ({eventId, name, dateStart, dateEnd, location, description, ticketPrice, ticketAmount, organizier}: EventProps) => {
   return html`
     <!-- Page header -->
     <div class="page-header d-print-none">
@@ -28,28 +28,28 @@ const PageOrder = ({id, title, date, location, description, price, ticketLeft, e
                   </div>
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title">${title}</h5>
+                  <h5 class="card-title">${name}</h5>
 
-                  <h5 class="card-title">${date}</h5>
+                  <h3 class="card-title">${dateStart} s/d ${dateEnd}</h3>
                   <h5 class="card-title">${location}</h5>
 
                   <div class="row row-deck">
                     <div class="col-md-4">Harga Tiket</div>
-                    <div class="col-md-8">: Rp ${price}</div>
+                    <div class="col-md-8">: Rp ${ticketPrice}</div>
 
                     <div class="col-md-4">Sisa Tiket</div>
-                    <div class="col-md-8">: ${ticketLeft}</div>
+                    <div class="col-md-8">: ${ticketAmount}</div>
 
                     <div class="col-12">
                       <form class="w-full">
                         <br/>
-                        <input type="number" class="form-control" placeholder="max: ${ticketLeft}" class="mb-4" required>
+                        <input type="number" class="form-control" placeholder="max: ${ticketAmount}" class="mb-4" required>
                         <br/>
                         <div class="flex" style="font-weight: bold; font-size: 1.2rem;">
                           Harga Total: Rp 0
                         </div>
                         <br/>
-                        <button type="submit" href="/event/${id}/order" class="btn btn-success btn-md w-full">Beli Tiket</button>
+                        <button type="submit" href="/event/${eventId}/order" class="btn btn-success btn-md w-full">Beli Tiket</button>
                       </form>
                     </div>
                   </div>

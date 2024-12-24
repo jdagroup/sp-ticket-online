@@ -31,6 +31,9 @@ const Header = () => {
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+            <a href="/orders" class="dropdown-item">Pesanan</a>
+            <a href="/tickets" class="dropdown-item">Tiket</a>
+            <div class="dropdown-divider"></div>
             <a href="/profile" class="dropdown-item">Pengaturan Akun</a>
             <a href="/logout" class="dropdown-item">Logout</a>
             <a href="/auth/login" class="dropdown-item">Login</a>

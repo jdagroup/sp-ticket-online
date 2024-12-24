@@ -15,9 +15,7 @@ app.use("/js/*", serveStatic({root: "./public"}));
 app.use("/icons/*", serveStatic({root: "./public"}));
 
 app.get('/', (c) => {
-
   const events: EventProps[] = getEvents();
-
   return c.html(
     PublicLayout({
       title: 'TixTix | Simple Online Ticket Reservation',
@@ -26,14 +24,16 @@ app.get('/', (c) => {
   );
 });
 
-import eventRouting from "./routing/event";
+import eventRouting from "./router/event";
 app.route("/event", eventRouting);
 
-
-import orderRouting from "./routing/event";
+import orderRouting from "./router/event";
 app.route("/order", orderRouting);
 
-import authRouting from "./routing/auth";
+import authRouting from "./router/auth";
 app.route("/auth", authRouting);
+
+import routing from "./router/router";
+app.route("/", routing);
 
 export default app;

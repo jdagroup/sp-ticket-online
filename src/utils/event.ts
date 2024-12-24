@@ -6,5 +6,5 @@ export const getEvents = (): EventProps[] => {
 }
 
 export const getEventById = (id: string): EventProps | undefined => {
-  return eventsData.find((item: EventProps) => item.id === id);
+  return eventsData.find((item: EventProps) => item.eventId === id);
 }
