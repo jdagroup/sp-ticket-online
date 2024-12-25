@@ -1,39 +1,30 @@
 import { Hono } from 'hono';
 import { serveStatic } from "hono/bun";
-import PublicLayout from './views/layout/public';
 
-import { getEvents } from './utils/event';
-import { EventProps } from './types/event';
+import route from "./routes";
+import { CookieStore, sessionMiddleware } from 'hono-sessions';
+import { HonoApp } from './types/hono';
 
-
-import PageIndex from './views/pages/index';
-
-const app = new Hono();
+const app = new Hono<HonoApp>();
 
 app.use("/css/*", serveStatic({root: "./public"}));
 app.use("/js/*", serveStatic({root: "./public"}));
 app.use("/icons/*", serveStatic({root: "./public"}));
 
-app.get('/', (c) => {
-  const events: EventProps[] = getEvents();
-  return c.html(
-    PublicLayout({
-      title: 'TixTix | Simple Online Ticket Reservation',
-      bodyContent: PageIndex({events})
-    })
-  );
-});
+const store = new CookieStore();
 
-import eventRouting from "./router/event";
-app.route("/event", eventRouting);
+app.use('*', sessionMiddleware({
+  store,
+  encryptionKey: 'password_at_least_32_characters_long', // Required for CookieStore, recommended for others
+  expireAfterSeconds: 900, // Expire session after 15 minutes of inactivity
+  cookieOptions: {
+    sameSite: 'Lax', // Recommended for basic CSRF protection in modern browsers
+    path: '/', // Required for this library to work properly
+    httpOnly: true, // Recommended to avoid XSS attacks,
+    maxAge: 2 * 60,
+  },
+}))
 
-import orderRouting from "./router/event";
-app.route("/order", orderRouting);
-
-import authRouting from "./router/auth";
-app.route("/auth", authRouting);
-
-import routing from "./router/router";
-app.route("/", routing);
+app.route("/", route);
 
 export default app;
