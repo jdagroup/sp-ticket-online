@@ -1,10 +1,16 @@
 import { html } from "hono/html"
+import { HtmlEscapedString } from "hono/utils/html";
 
-const PageLogin = () => {
+type Props = {
+  _alert: HtmlEscapedString | Promise<HtmlEscapedString>;
+}
+
+const PageLogin = ({_alert}: Props) => {
   return html`
   <div class="card card-md">
     <div class="card-body">
       <h2 class="h2 text-center mb-4">Masuk Ke Akun Anda</h2>
+      <div id="alert">${_alert}</div>
       <form action="./" method="post" autocomplete="off" novalidate>
         <div class="mb-3">
           <label class="form-label">Alamat Email</label>

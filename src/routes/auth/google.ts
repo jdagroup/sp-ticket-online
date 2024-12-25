@@ -4,16 +4,15 @@ import {
   generateState,
   getGoogleOAuthTokens,
   getGoogleUser,
-} from '../utils/oauth';
+} from '~/utils/oauth';
 import { getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
-import { addUser, checkIfUserExistsByEmail } from '../services/user-service';
-import { addToken } from '../services/auth-service';
-import { generateAccessToken, generateRefreshToken } from '../utils/token';
+import { addUser, checkIfUserExistsByEmail } from '~/services/user-service';
+import { addToken } from '~/services/auth-service';
+import { generateAccessToken, generateRefreshToken } from '~/utils/token';
 
-const authRote = new Hono();
-
-authRote.get('/google', (c) => {
+const googleRoute = new Hono()
+.get('/', (c) => {
   const scope = [
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email',
@@ -34,9 +33,8 @@ authRote.get('/google', (c) => {
   // Using 'HX-Redirect' so that HTMX 'hx-get' can redirect into another page
   c.header('HX-Redirect', googleOAuthURL);
   return c.body(null);
-});
-
-authRote.get('/google/callback', async (c) => {
+})
+.get('/callback', async (c) => {
   try {
     const { code, state } = c.req.query();
     const storedState = getCookie(c, 'google_oauth_state');
@@ -155,4 +153,4 @@ authRote.get('/google/callback', async (c) => {
   }
 });
 
-export default authRote;
+export default googleRoute;

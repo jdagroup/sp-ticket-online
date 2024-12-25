@@ -1,28 +1,43 @@
 import { createMiddleware } from 'hono/factory';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
-import { checkIfTokenExists, deleteToken } from '../services/auth-service';
+import { checkIfTokenExists, deleteToken } from '~/services/auth-service';
 import {
   jwtPayloadSchema,
   type JwtPayload,
-} from '../schemas/jwt-payload-schema';
+} from '~/schemas/jwt-payload-schema';
 import {
   handleTokenRefresh,
   handleTokenReuse,
   verifyAccessToken,
   verifyRefreshToken,
-} from '../utils/token';
+} from '~/utils/token';
+import { Session } from 'hono-sessions';
+
+type Props = {
+  jwtPayload: JwtPayload;
+  message: string;
+  session: Session<Record<string, any>>;
+};
 
 const authMiddleware = createMiddleware<{
-  Variables: { jwtPayload: JwtPayload };
+  Variables: Props;
 }>(async (c, next) => {
   const accessToken = getCookie(c, 'access_token');
   const refreshToken = getCookie(c, 'refresh_token');
+
+  const needAuthAlert = {
+    variant: "warning",
+    title: "Akses Tidak Diizinkan",
+    content: "Silahkan login untuk melanjutkan"
+  };
+  const session = c.get("session");
+  session.flash("alert", needAuthAlert);
 
   let jwtPayload;
 
   if (!accessToken) {
     if (!refreshToken) {
-      return c.redirect('/login');
+      return c.redirect('/auth/login');
     }
 
     deleteCookie(c, 'refresh_token');
@@ -34,9 +49,9 @@ const authMiddleware = createMiddleware<{
       try {
         await handleTokenReuse(refreshToken);
 
-        return c.redirect('/login');
+        return c.redirect('/auth/login');
       } catch (error) {
-        return c.redirect('/login');
+        return c.redirect('/auth/login');
       }
     }
 
@@ -46,7 +61,7 @@ const authMiddleware = createMiddleware<{
       );
 
       if (foundToken.user.name !== jwtPayload.name) {
-        return c.redirect('/login');
+        return c.redirect('/auth/login');
       }
 
       const { newAccessToken, newRefreshToken } = await handleTokenRefresh(
@@ -75,7 +90,7 @@ const authMiddleware = createMiddleware<{
       await next();
     } catch (error) {
       await deleteToken({ token: refreshToken });
-      return c.redirect('/login');
+      return c.redirect('/auth/login');
     }
   } else {
     try {
@@ -86,7 +101,7 @@ const authMiddleware = createMiddleware<{
         error.message === `token (${accessToken}) expired`
       ) {
         if (!refreshToken) {
-          return c.redirect('/login');
+          return c.redirect('/auth/login');
         }
 
         deleteCookie(c, 'refresh_token');
@@ -100,9 +115,9 @@ const authMiddleware = createMiddleware<{
           try {
             await handleTokenReuse(refreshToken);
 
-            return c.redirect('/login');
+            return c.redirect('/auth/login');
           } catch (error) {
-            return c.redirect('/login');
+            return c.redirect('/auth/login');
           }
         }
 
@@ -112,7 +127,7 @@ const authMiddleware = createMiddleware<{
           );
 
           if (foundToken.user.name !== jwtPayload.name) {
-            return c.redirect('/login');
+            return c.redirect('/auth/login');
           }
 
           const { newAccessToken, newRefreshToken } = await handleTokenRefresh(
@@ -141,11 +156,11 @@ const authMiddleware = createMiddleware<{
           await next();
         } catch (error) {
           await deleteToken({ token: refreshToken });
-          return c.redirect('/login');
+          return c.redirect('/auth/login');
         }
       }
       deleteCookie(c, 'access_token');
-      return c.redirect('/login');
+      return c.redirect('/auth/login');
     }
 
     c.set('jwtPayload', jwtPayload);
