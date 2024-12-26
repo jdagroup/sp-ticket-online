@@ -9,6 +9,7 @@ import {
   deleteAllTokensByUserId,
   deleteToken,
 } from '../services/auth-service';
+import type { UserDataPayload } from '../types/user-type';
 
 const generateAccessToken = async (payload: JWTPayload) => {
   try {
@@ -107,6 +108,39 @@ const handleTokenRefresh = async (token: string, tokenPayload: JwtPayload) => {
   }
 };
 
+const handleUserToken = async (userData: UserDataPayload) => {
+  try {
+    const payload = {
+      id: userData.id,
+      name: userData.name,
+      eo_id: null,
+      exp:
+        Math.floor(Date.now() / 1000) +
+        60 * Number(process.env.ACCESS_TOKEN_EXPIRE_IN_MINUTES),
+      iat: Math.floor(Date.now() / 1000),
+    };
+
+    const accessToken = await generateAccessToken(payload);
+
+    const refreshToken = await generateRefreshToken({
+      ...payload,
+      exp:
+        Math.floor(Date.now() / 1000) +
+        60 * Number(process.env.REFRESH_TOKEN_EXPIRE_IN_MINUTES),
+    });
+
+    await addToken({ token: refreshToken, userId: userData.id });
+
+    return { accessToken, refreshToken };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error('Unknown error');
+  }
+};
+
 export {
   generateAccessToken,
   generateRefreshToken,
@@ -114,4 +148,5 @@ export {
   verifyRefreshToken,
   handleTokenReuse,
   handleTokenRefresh,
+  handleUserToken,
 };

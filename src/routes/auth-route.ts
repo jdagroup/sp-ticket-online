@@ -8,8 +8,7 @@ import {
 import { getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import { addUser, checkIfUserExistsByEmail } from '../services/user-service';
-import { addToken } from '../services/auth-service';
-import { generateAccessToken, generateRefreshToken } from '../utils/token';
+import { handleUserToken } from '../utils/token';
 
 const authRote = new Hono();
 
@@ -56,26 +55,7 @@ authRote.get('/google/callback', async (c) => {
     });
 
     if (userExists) {
-      const payload = {
-        id: userExists.id,
-        name: userExists.name,
-        eo_id: null,
-        exp:
-          Math.floor(Date.now() / 1000) +
-          60 * Number(process.env.ACCESS_TOKEN_EXPIRE_IN_MINUTES),
-        iat: Math.floor(Date.now() / 1000),
-      };
-
-      const accessToken = await generateAccessToken(payload);
-
-      const refreshToken = await generateRefreshToken({
-        ...payload,
-        exp:
-          Math.floor(Date.now() / 1000) +
-          60 * Number(process.env.REFRESH_TOKEN_EXPIRE_IN_MINUTES),
-      });
-
-      await addToken({ token: refreshToken, userId: userExists.id });
+      const { accessToken, refreshToken } = await handleUserToken(userExists);
 
       setCookie(c, 'access_token', accessToken, {
         maxAge: 60 * Number(process.env.ACCESS_TOKEN_EXPIRE_IN_MINUTES),
@@ -104,26 +84,7 @@ authRote.get('/google/callback', async (c) => {
       role: 'user',
     });
 
-    const payload = {
-      id: addedUser.id,
-      name: addedUser.name,
-      eo_id: null,
-      exp:
-        Math.floor(Date.now() / 1000) +
-        60 * Number(process.env.ACCESS_TOKEN_EXPIRE_IN_MINUTES),
-      iat: Math.floor(Date.now() / 1000),
-    };
-
-    const accessToken = await generateAccessToken(payload);
-
-    const refreshToken = await generateRefreshToken({
-      ...payload,
-      exp:
-        Math.floor(Date.now() / 1000) +
-        60 * Number(process.env.REFRESH_TOKEN_EXPIRE_IN_MINUTES),
-    });
-
-    await addToken({ token: refreshToken, userId: addedUser.id });
+    const { accessToken, refreshToken } = await handleUserToken(addedUser);
 
     setCookie(c, 'access_token', accessToken, {
       maxAge: 60 * Number(process.env.ACCESS_TOKEN_EXPIRE_IN_MINUTES),
