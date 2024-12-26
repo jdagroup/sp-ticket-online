@@ -1,3 +1,5 @@
+import { EventProps } from "./event";
+
 export enum OrderStatus{
   Pending = "pending",
   Paid = "paid",
@@ -6,11 +8,13 @@ export enum OrderStatus{
 };
 
 export type OrderProps = {
-  OrderId: string;
-  EventId: string;
-  UserId: string;
-  Quantity: number;
-  TicketPrice: number;
-  TotalPrice: number;
-  Status: OrderStatus;
+  orderId: string;
+  eventId: string;
+  userId: string;
+  quantity: number;
+  ticketPrice: number;
+  totalPrice: number;
+  status: OrderStatus;
+
+  event: EventProps;
 };

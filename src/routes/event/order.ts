@@ -9,7 +9,7 @@ import PublicLayout from '~/views/layout/public';
 import authMiddleware from "~/middlewares/auth-middleware";
 
 const app = new Hono()
-.use(authMiddleware)
+// .use(authMiddleware)
 .get("/", (c) => {
   const event: EventProps | undefined = getEventById(c.req.param("id") as string);
 
@@ -17,7 +17,7 @@ const app = new Hono()
 
   return c.html(
     PublicLayout({
-      title: 'Detail Event A | ',
+      title: (event ? event.name : ''),
       bodyContent: content,
     })
   )

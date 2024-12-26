@@ -9,6 +9,7 @@ import { deleteToken } from '~/services/auth-service';
 import authRoute from "./auth";
 import eventRoute from "./event";
 import eoRoute from "./eo";
+import orderRoute from "./order";
 
 import AuthLayout from '~/views/layout/auth';
 import PublicLayout from '~/views/layout/public';
@@ -17,7 +18,7 @@ import PageProfile from "~/views/pages/profile";
 import PageIndex from '~/views/pages/index';
 
 const app = new Hono()
-  .get('/', authMiddleware, (c) => {
+  .get('/', (c) => {
     const events: EventProps[] = getEvents();
     return c.html(
       PublicLayout({
@@ -34,7 +35,7 @@ const app = new Hono()
       })
     );
   })
-  .get('/profile', authMiddleware, (c) => {
+  .get('/profile', /*authMiddleware,*/ (c) => {
     return c.html(
       PublicLayout({
         title: 'Pengaturan Akun',
@@ -67,6 +68,7 @@ const app = new Hono()
   })
   .route('/auth', authRoute)
   .route('/event', eventRoute)
+  .route('/order', orderRoute)
   .route('/eo', eoRoute);
 
 export default app;

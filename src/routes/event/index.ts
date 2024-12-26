@@ -3,9 +3,8 @@ import { html } from "hono/html";
 
 import orderRoute from "./order";
 
-import { getEventById, getEvents } from '~/utils/event';
+import { getEventById } from '~/utils/event';
 import PageEventDetail from "~/views/pages/event/detail"
-import PageEventOrder from "~/views/pages/event/order"
 import { EventProps } from '~/types/event';
 
 import PublicLayout from '~/views/layout/public';
@@ -17,7 +16,7 @@ const app = new Hono()
 
   return c.html(
     PublicLayout({
-      title: 'Detail Event A | ',
+      title: (event ? event.name : ''),
       bodyContent: content,
     })
   )

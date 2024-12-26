@@ -24,12 +24,4 @@ export type EventProps = {
   status: EventStatus;
 
   organizier: Partial<EventOrganizier>;
-
-  // title: string;
-  // date: string;
-  // price: number | string;
-  // ticketLeft: number;
-  // location?: string;
-  // eventOrganizier?: EventOrganizier;
-  // description?: string;
 }

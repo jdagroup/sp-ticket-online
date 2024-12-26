@@ -31,8 +31,8 @@ const Header = () => {
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <a href="/orders" class="dropdown-item">Pesanan</a>
-            <a href="/tickets" class="dropdown-item">Tiket</a>
+            <a href="/order" class="dropdown-item">Riwayat Pembelian</a>
+            <a href="/ticket" class="dropdown-item">Tiket</a>
             <div class="dropdown-divider"></div>
             <a href="/profile" class="dropdown-item">Pengaturan Akun</a>
             <a hx-get="/auth/logout" class="dropdown-item">Logout</a>
