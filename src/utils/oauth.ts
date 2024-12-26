@@ -49,6 +49,10 @@ const getGoogleOAuthTokens = async ({ code }: { code: string }) => {
       },
     });
 
+    if (!response.ok) {
+      throw new Error('Response error');
+    }
+
     return await response.json();
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -69,6 +73,10 @@ const getGoogleUser = async ({ accessToken }: { accessToken: string }) => {
         },
       }
     );
+
+    if (!response.ok) {
+      throw new Error('Response error');
+    }
 
     return await response.json();
   } catch (error: unknown) {
