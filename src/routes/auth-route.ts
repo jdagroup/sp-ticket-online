@@ -37,27 +37,19 @@ authRote.get('/google', (c) => {
 });
 
 authRote.get('/google/callback', async (c) => {
+  const { code, state } = c.req.query();
+  const storedState = getCookie(c, 'google_oauth_state');
+
+  if (!code || !state || !storedState || state !== storedState) {
+    throw new HTTPException(400);
+  }
+
   try {
-    const { code, state } = c.req.query();
-    const storedState = getCookie(c, 'google_oauth_state');
-
-    if (!code || !state || !storedState || state !== storedState) {
-      throw new HTTPException(400);
-    }
-
     const googleOAuthTokens = await getGoogleOAuthTokens({ code });
-
-    if ('error' in googleOAuthTokens) {
-      throw new HTTPException(400);
-    }
 
     const googleUser = await getGoogleUser({
       accessToken: googleOAuthTokens.access_token,
     });
-
-    if ('error' in googleUser) {
-      throw new HTTPException(400);
-    }
 
     const userExists = await checkIfUserExistsByEmail({
       email: googleUser.email,
@@ -151,6 +143,10 @@ authRote.get('/google/callback', async (c) => {
 
     return c.redirect('/');
   } catch (error) {
+    if (error instanceof Error && error.message === 'Response error') {
+      throw new HTTPException(400);
+    }
+
     throw new HTTPException(500);
   }
 });
