@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { html } from 'hono/html';
-import { setCookie } from 'hono/cookie';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 
 import googleRoute from './google';
 
@@ -15,12 +15,10 @@ import { ZodError } from 'zod';
 import { checkIfUserExistsByEmailWithDetails } from '~/services/user-service';
 import { handleUserToken } from '~/utils/token';
 import checkTokenMiddleware from '~/middlewares/check-token-middleware';
+import { deleteToken } from '~/services/auth-service';
 
 const app = new Hono<HonoApp>()
   .use(checkTokenMiddleware)
-  .get('/', (c) => {
-    return c.html(html`Auth Routing`);
-  })
   .get('/login', (c) => {
     const session = c.get('session');
     const alertSession = session.get('alert');
@@ -132,6 +130,27 @@ const app = new Hono<HonoApp>()
 
       throw new HTTPException(500);
     }
+  })
+  .get('/logout', async (c) => {
+    const accessToken = getCookie(c, 'access_token');
+    const refreshToken = getCookie(c, 'refresh_token');
+
+    if (accessToken) {
+      deleteCookie(c, 'access_token');
+    }
+
+    if (refreshToken) {
+      try {
+        await deleteToken({ token: refreshToken });
+        deleteCookie(c, 'refresh_token');
+      } catch (error: unknown) {
+        deleteCookie(c, 'refresh_token');
+      }
+    }
+
+    // Using 'HX-Redirect' so that HTMX 'hx-get' can redirect into another page
+    c.header('HX-Redirect', '/auth/login');
+    return c.body(null);
   })
   .route('/google', googleRoute);
 

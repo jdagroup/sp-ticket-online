@@ -22,29 +22,29 @@ const app = new Hono()
     return c.html(
       PublicLayout({
         title: 'TixTix | Simple Online Ticket Reservation',
-        bodyContent: PageIndex({events})
-      })
-    )
-  })
-  .get("/register", (c) => {
-    return c.html(
-      AuthLayout({
-        title: "Register",
-        bodyContent: PageRegister()
-      })
-    )
-  })
-  .get("/profile", (c) => {
-    return c.html(
-      PublicLayout({
-        title: "Pengaturan Akun",
-        bodyContent: PageProfile({
-          isEo: true,
-        })
+        bodyContent: PageIndex({ events }),
       })
     );
   })
-  .get("/logout", async (c) => {
+  .get('/register', (c) => {
+    return c.html(
+      AuthLayout({
+        title: 'Register',
+        bodyContent: PageRegister(),
+      })
+    );
+  })
+  .get('/profile', authMiddleware, (c) => {
+    return c.html(
+      PublicLayout({
+        title: 'Pengaturan Akun',
+        bodyContent: PageProfile({
+          isEo: true,
+        }),
+      })
+    );
+  })
+  .get('/logout', async (c) => {
     const accessToken = getCookie(c, 'access_token');
     const refreshToken = getCookie(c, 'refresh_token');
 
@@ -65,9 +65,9 @@ const app = new Hono()
     c.header('HX-Redirect', '/login');
     return c.body(null);
   })
-  .route("/auth", authRoute)
-  .route("/event", eventRoute)
-  .route("/eo", eoRoute);
+  .route('/auth', authRoute)
+  .route('/event', eventRoute)
+  .route('/eo', eoRoute);
 
 export default app;
 

@@ -1,6 +1,4 @@
-type UserDataPayload = {
+export type UserDataPayload = {
   id: string;
   name: string;
 };
-
-export { UserDataPayload };

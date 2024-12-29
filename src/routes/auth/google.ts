@@ -8,9 +8,7 @@ import {
 import { getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import { addUser, checkIfUserExistsByEmail } from '~/services/user-service';
-import {
-  handleUserToken,
-} from '~/utils/token';
+import { handleUserToken } from '~/utils/token';
 
 const googleRoute = new Hono()
   .get('/', (c) => {
@@ -36,14 +34,14 @@ const googleRoute = new Hono()
     return c.body(null);
   })
   .get('/callback', async (c) => {
-    try {
-      const { code, state } = c.req.query();
-      const storedState = getCookie(c, 'google_oauth_state');
+    const { code, state } = c.req.query();
+    const storedState = getCookie(c, 'google_oauth_state');
 
       if (!code || !state || !storedState || state !== storedState) {
         throw new HTTPException(400);
       }
 
+    try {
       const googleOAuthTokens = await getGoogleOAuthTokens({ code });
 
       const googleUser = await getGoogleUser({
