@@ -1,5 +1,8 @@
 {
   "name": "sp-ticket-online",
+  "prisma": {
+    "seed": "bun prisma/seed.ts"
+  },
   "scripts": {
     "dev": "bun run --hot src/index.ts"
   },

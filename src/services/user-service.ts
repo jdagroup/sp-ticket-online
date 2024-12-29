@@ -22,6 +22,26 @@ const checkIfUserExistsByEmail = async ({ email }: { email: string }) => {
   }
 };
 
+const checkIfUserExistsByEmailWithDetails = async ({
+  email,
+}: {
+  email: string;
+}) => {
+  try {
+    return await prismaClient.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error('Unknown error');
+  }
+};
+
 const addUser = async ({
   name,
   email,
@@ -73,4 +93,8 @@ const addUser = async ({
   }
 };
 
-export { checkIfUserExistsByEmail, addUser };
+export {
+  checkIfUserExistsByEmail,
+  checkIfUserExistsByEmailWithDetails,
+  addUser,
+};

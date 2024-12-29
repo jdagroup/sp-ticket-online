@@ -37,9 +37,9 @@ const googleRoute = new Hono()
     const { code, state } = c.req.query();
     const storedState = getCookie(c, 'google_oauth_state');
 
-    if (!code || !state || !storedState || state !== storedState) {
-      throw new HTTPException(400);
-    }
+      if (!code || !state || !storedState || state !== storedState) {
+        throw new HTTPException(400);
+      }
 
     try {
       const googleOAuthTokens = await getGoogleOAuthTokens({ code });
