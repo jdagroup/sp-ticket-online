@@ -22,7 +22,7 @@ logoutRoute.get('/', async (c) => {
   }
 
   // Using 'HX-Redirect' so that HTMX 'hx-get' can redirect into another page
-  c.header('HX-Redirect', '/login');
+  c.header('HX-Redirect', '/auth/login');
   return c.body(null);
 });
 

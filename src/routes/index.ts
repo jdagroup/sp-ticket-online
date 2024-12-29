@@ -17,7 +17,7 @@ import PageProfile from "~/views/pages/profile";
 import PageIndex from '~/views/pages/index';
 
 const app = new Hono()
-  .get('/', (c) => {
+  .get('/', authMiddleware, (c) => {
     const events: EventProps[] = getEvents();
     return c.html(
       PublicLayout({
@@ -47,11 +47,11 @@ const app = new Hono()
   .get("/logout", async (c) => {
     const accessToken = getCookie(c, 'access_token');
     const refreshToken = getCookie(c, 'refresh_token');
-  
+
     if (accessToken) {
       deleteCookie(c, 'access_token');
     }
-  
+
     if (refreshToken) {
       try {
         await deleteToken({ token: refreshToken });
@@ -60,7 +60,7 @@ const app = new Hono()
         deleteCookie(c, 'refresh_token');
       }
     }
-  
+
     // Using 'HX-Redirect' so that HTMX 'hx-get' can redirect into another page
     c.header('HX-Redirect', '/login');
     return c.body(null);
