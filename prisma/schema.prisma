@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum userStatus {
+enum UserStatus {
   waitingConfirmation @map("waiting_confirmation")
   active
   banned
@@ -21,7 +21,7 @@ enum userStatus {
   @@map("user_status")
 }
 
-enum userRole {
+enum UserRole {
   user
   organizer
   admin
@@ -30,15 +30,37 @@ enum userRole {
   @@map("user_role")
 }
 
+enum EventStatus {
+  pending
+  openRegistration  @map("open_registration")
+  closeRegistration @map("close_registration")
+  done
+  eventPostpone     @map("event_postpone")
+  eventCancel       @map("event_cancel")
+
+  @@map("event_status")
+}
+
+enum StatusOrder {
+  pending
+  paid
+  expire
+  cancel
+
+  @@map("status_order")
+}
+
 model User {
   id              String           @id @default(uuid())
   name            String
   email           String           @unique
   password        String?
   emailVerifiedAt DateTime?        @map("email_verified_at")
-  status          userStatus
-  role            userRole
+  status          UserStatus
+  role            UserRole
   authentications Authentication[]
+  eventOrganizers EventOrganizer[]
+  orders          Order[]
 
   @@map("users")
 }
@@ -49,4 +71,92 @@ model Authentication {
   userId String @map("user_id")
 
   @@map("authentications")
+}
+
+model EventOrganizer {
+  id              String       @id @default(uuid())
+  name            String
+  code            String       @unique
+  user            User         @relation(fields: [ownerId], references: [id])
+  ownerId         String       @map("owner_id")
+  events          Event[]
+  ticketsCheckIn  Ticket[]     @relation("TicketCheckIns")
+  ticketsCheckOut Ticket[]     @relation("TicketCheckOuts")
+  eoOfficial      EOOfficial[]
+
+  @@map("event_organizers")
+}
+
+model Event {
+  id             String          @id @default(uuid())
+  eventOrganizer EventOrganizer  @relation(fields: [eoId], references: [id])
+  eoId           String          @map("eo_id")
+  name           String
+  description    String
+  location       String
+  dateStart      DateTime        @map("date_start")
+  dateEnd        DateTime        @map("date_end")
+  ticketPrice    Int             @map("ticket_price")
+  ticketAmount   Int             @map("ticket_amount")
+  ticketRegOpen  DateTime        @map("ticket_reg_open")
+  ticketRegClose DateTime        @map("ticket_reg_close")
+  status         EventStatus
+  orders         Order[]
+  eventOfficials EventOfficial[]
+
+  @@map("events")
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  event       Event       @relation(fields: [eventId], references: [id])
+  eventId     String      @map("event_id")
+  user        User        @relation(fields: [userId], references: [id])
+  userId      String      @map("user_id")
+  quantity    Int
+  ticketPrice Int         @map("ticket_price")
+  totalPrice  Int         @map("total_price")
+  status      StatusOrder
+  tickets     Ticket[]
+
+  @@map("orders")
+}
+
+model Ticket {
+  id           String         @id @default(uuid())
+  order        Order          @relation(fields: [orderId], references: [id])
+  orderId      String         @map("order_id")
+  ticketNumber Int            @map("ticket_number")
+  code         String         @unique @db.VarChar(8)
+  checkIn      DateTime       @map("check_in")
+  checkInEO    EventOrganizer @relation("TicketCheckIns", fields: [checkInBy], references: [id])
+  checkInBy    String         @map("check_in_by")
+  checkOut     DateTime       @map("check_out")
+  checkOutEO   EventOrganizer @relation("TicketCheckOuts", fields: [checkOutBy], references: [id])
+  checkOutBy   String         @map("check_out_by")
+
+  @@map("tickets")
+}
+
+model EOOfficial {
+  id              String          @id @default(uuid())
+  eventOrganizer  EventOrganizer  @relation(fields: [eoId], references: [id])
+  eoId            String          @map("eo_id")
+  name            String
+  username        String
+  password        String
+  eventsOfficials EventOfficial[]
+
+  @@map("eo_officials")
+}
+
+model EventOfficial {
+  events     Event      @relation(fields: [eventId], references: [id])
+  eventId    String     @map("event_id")
+  eoOfficial EOOfficial @relation(fields: [officialId], references: [id])
+  officialId String     @map("official_id")
+
+  // https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/working-with-composite-ids-and-constraints
+  @@id([eventId, officialId])
+  @@map("event_officials")
 }

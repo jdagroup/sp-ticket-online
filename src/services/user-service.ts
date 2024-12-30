@@ -1,5 +1,5 @@
 import prismaClient from '../libs/prismaClient';
-import { userStatus, userRole } from '@prisma/client';
+import { UserStatus, UserRole } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
 const checkIfUserExistsByEmail = async ({ email }: { email: string }) => {
@@ -54,8 +54,8 @@ const addUser = async ({
   email: string;
   password?: string;
   emailVerifiedAt?: Date;
-  status: userStatus;
-  role: userRole;
+  status: UserStatus;
+  role: UserRole;
 }) => {
   try {
     const id = `user-${nanoid(16)}`;
