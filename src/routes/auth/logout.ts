@@ -1,10 +1,9 @@
 import { Hono } from 'hono';
 import { deleteCookie, getCookie } from 'hono/cookie';
-import { deleteToken } from '../services/auth-service';
+import { deleteToken } from '~/services/auth-service';
 
-const logoutRoute = new Hono();
-
-logoutRoute.get('/', async (c) => {
+const logoutRoute = new Hono()
+  .get('/', async (c) => {
   const accessToken = getCookie(c, 'access_token');
   const refreshToken = getCookie(c, 'refresh_token');
 
