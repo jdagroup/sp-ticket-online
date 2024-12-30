@@ -4,7 +4,9 @@
     "seed": "bun prisma/seed.ts"
   },
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "migrate": "bunx prisma migrate",
+    "db:seed": "bunx prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
