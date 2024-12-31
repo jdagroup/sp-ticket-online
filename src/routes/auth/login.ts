@@ -105,7 +105,16 @@ const loginRoute = new Hono<HonoApp>()
         sameSite: 'lax',
       });
 
-      c.header('HX-Redirect', '/');
+      if (checkedUser.role === 'user') {
+        c.header('HX-Redirect', '/');
+      } else if (checkedUser.role === 'organizer') {
+        c.header('HX-Redirect', '/eo');
+      } else if (
+        checkedUser.role === 'admin' ||
+        checkedUser.role === 'superadmin'
+      ) {
+        c.header('HX-Redirect', '/admin');
+      }
       return c.body(null);
     } catch (error) {
       console.log(error);
